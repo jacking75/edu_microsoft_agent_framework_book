@@ -19,7 +19,7 @@ public class LoggingMiddleware
         _logger = logger;
     }
 
-    public async Task<string> RunAsync(string input, object? thread = null)
+    public async Task<string> RunAsync(string input, Microsoft.Agents.AI.AgentSession? session = null)
     {
         var requestId = Interlocked.Increment(ref _requestCount);
         var sw        = System.Diagnostics.Stopwatch.StartNew();
@@ -29,8 +29,8 @@ public class LoggingMiddleware
 
         try
         {
-            var result = thread != null
-                ? await _agent.RunAsync(input, thread)
+            var result = session != null
+                ? await _agent.RunAsync(input, session)
                 : await _agent.RunAsync(input);
 
             sw.Stop();

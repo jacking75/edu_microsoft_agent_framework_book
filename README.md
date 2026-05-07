@@ -19,7 +19,7 @@
 
 ## 특징
 
-- **Azure 미사용**: Poe 또는 OpenRouter의 OpenAI 호환 API만 사용
+- **특정 LLM 미사용**: Poe 또는 OpenRouter의 OpenAI 호환 API만 사용
 - **AIAgent 추상화**: LLM이 바뀌어도 최소한의 코드 변경으로 대응 가능한 `AIAgentBuilder` 래퍼 제공
 - **최신 버전 기준**: Microsoft Agent Framework 정식 출시 버전 기준으로 작성
 - **실전 예제**: 각 챕터마다 바로 실행 가능한 C# 예제 코드 포함

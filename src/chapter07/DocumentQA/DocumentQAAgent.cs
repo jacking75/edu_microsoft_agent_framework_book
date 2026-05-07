@@ -1,4 +1,5 @@
 using AgentFrameworkBook.Shared;
+using Microsoft.Agents.AI;
 
 namespace AgentFrameworkBook.Chapter07;
 
@@ -72,7 +73,7 @@ public class DocumentQAAgent
             {question}
             """;
 
-        await foreach (var chunk in _agent.RunStreamAsync(prompt))
+        await foreach (var chunk in _agent.RunStreamingAsync(prompt))
         {
             if (!string.IsNullOrEmpty(chunk.Text))
                 yield return chunk.Text;

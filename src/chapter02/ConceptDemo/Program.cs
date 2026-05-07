@@ -29,21 +29,21 @@ Console.WriteLine($"❓ {q1}");
 var r1 = await agent.RunAsync(q1);
 Console.WriteLine($"🤖 {r1.Text}\n");
 
-// ── 4. Thread 개념 확인 ───────────────────────────────────────────
-Console.WriteLine("── Thread (멀티턴 대화) ─────────────────");
-var thread = agent.CreateThread();
+// ── 4. Session(멀티턴 대화) 개념 확인 ─────────────────────────────
+Console.WriteLine("── Session (멀티턴 대화) ────────────────");
+var session = await agent.CreateSessionAsync();
 
 var questions = new[]
 {
     "AIAgent 객체의 핵심 역할은?",
     "Tool이란 무엇인가?",
-    "Thread는 왜 필요한가?"
+    "Session은 왜 필요한가?"
 };
 
 foreach (var q in questions)
 {
     Console.WriteLine($"❓ {q}");
-    var r = await agent.RunAsync(q, thread);
+    var r = await agent.RunAsync(q, session);
     Console.WriteLine($"🤖 {r.Text}\n");
 }
 

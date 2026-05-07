@@ -2,9 +2,11 @@
 // 실행: dotnet run
 // 사전 준비: .env.example을 복사하여 .env 파일을 만들고 API 키를 설정한다.
 
+using System.ClientModel;
 using DotNetEnv;
 using Microsoft.Agents.AI;
-using Microsoft.Agents.AI.OpenAI;
+using Microsoft.Extensions.AI;
+using OpenAI;
 
 Console.WriteLine("=== Chapter 01: 환경 확인 ===\n");
 
@@ -44,11 +46,15 @@ Console.WriteLine();
 
 try
 {
-    var client = new OpenAIAgentClient(new Uri(baseUrl), apiKey);
-    var agent  = client.CreateAIAgent(
-        model:        model,
-        name:         "TestAgent",
-        instructions: "간결하게 답변하는 테스트 어시스턴트다.");
+    var client = new OpenAIClient(
+        new ApiKeyCredential(apiKey),
+        new OpenAIClientOptions { Endpoint = new Uri(baseUrl) });
+
+    IChatClient chatClient = client.GetChatClient(model).AsIChatClient();
+
+    var agent = chatClient.AsAIAgent(
+        instructions: "간결하게 답변하는 테스트 어시스턴트다.",
+        name:         "TestAgent");
 
     var result = await agent.RunAsync("한 문장으로 자기소개를 해줘.");
 

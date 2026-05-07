@@ -1,7 +1,9 @@
 using System;
+using System.ClientModel;
 using System.Collections.Generic;
 using Microsoft.Agents.AI;
-using Microsoft.Agents.AI.OpenAI;
+using Microsoft.Extensions.AI;
+using OpenAI;
 
 namespace AgentFrameworkBook.Shared;
 
@@ -37,7 +39,7 @@ public class AIAgentBuilder
     public static AIAgentBuilder WithPoe(
         string apiKey,
         string model = "claude-sonnet-4-20250514")
-        => new(apiKey, "https://api.poe.com/llm/v1", model);
+        => new(apiKey, "https://api.poe.com/v1", model);
 
     /// <summary>
     /// 커스텀 OpenAI-호환 엔드포인트를 사용하는 빌더를 생성한다.
@@ -101,18 +103,23 @@ public class AIAgentBuilder
         string instructions,
         params AIFunction[] tools)
     {
-        var client = new OpenAIAgentClient(new Uri(_baseUrl), _apiKey);
+        var client = new OpenAIClient(
+            new ApiKeyCredential(_apiKey),
+            new OpenAIClientOptions { Endpoint = new Uri(_baseUrl) });
 
-        return tools.Length == 0
-            ? client.CreateAIAgent(
-                model:        _model,
-                name:         name,
-                instructions: instructions)
-            : client.CreateAIAgent(
-                model:        _model,
-                name:         name,
+        IChatClient chatClient = client.GetChatClient(_model).AsIChatClient();
+
+        if (tools.Length == 0)
+        {
+            return chatClient.AsAIAgent(
                 instructions: instructions,
-                tools:        tools);
+                name:         name);
+        }
+
+        return chatClient.AsAIAgent(
+            instructions: instructions,
+            name:         name,
+            tools:        tools);
     }
 
     /// <summary>

@@ -1,5 +1,5 @@
-using AgentFrameworkBook.Shared;
 using Microsoft.Agents.AI;
+using AIAgentBuilder = AgentFrameworkBook.Shared.AIAgentBuilder;
 
 namespace AgentFrameworkBook.Chapter09;
 

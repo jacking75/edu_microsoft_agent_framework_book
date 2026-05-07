@@ -15,7 +15,7 @@ var agent = AIAgentBuilder.FromEnvironment()
     .Build("StreamAgent", "친절한 어시스턴트다.");
 
 Console.Write("🤖 Agent: ");
-await foreach (var chunk in agent.RunStreamAsync("게임 서버 개발에서 중요한 3가지 원칙을 설명해줘"))
+await foreach (var chunk in agent.RunStreamingAsync("게임 서버 개발에서 중요한 3가지 원칙을 설명해줘"))
 {
     if (!string.IsNullOrEmpty(chunk.Text))
         Console.Write(chunk.Text);
@@ -25,7 +25,7 @@ Console.WriteLine("\n");
 // ── 2. Thread와 함께 Streaming ────────────────────────────────────
 Console.WriteLine("── 2. Thread + Streaming 대화 ────────────");
 
-var thread = agent.CreateThread();
+var thread = await agent.CreateSessionAsync();
 var chatMessages = new[]
 {
     "나는 C# 게임 서버 개발자야.",
@@ -38,7 +38,7 @@ foreach (var msg in chatMessages)
     Console.WriteLine($"👤 {msg}");
     Console.Write("🤖 ");
 
-    await foreach (var chunk in agent.RunStreamAsync(msg, thread))
+    await foreach (var chunk in agent.RunStreamingAsync(msg, thread))
     {
         if (!string.IsNullOrEmpty(chunk.Text))
             Console.Write(chunk.Text);
@@ -60,7 +60,7 @@ var toolAgent = AIAgentBuilder.FromEnvironment()
         new Delegate[] { GetWeather });
 
 Console.Write("🤖 ");
-await foreach (var chunk in toolAgent.RunStreamAsync("서울과 부산 날씨를 비교해줘"))
+await foreach (var chunk in toolAgent.RunStreamingAsync("서울과 부산 날씨를 비교해줘"))
 {
     if (!string.IsNullOrEmpty(chunk.Text))
         Console.Write(chunk.Text);
@@ -102,7 +102,7 @@ class LoggingAgentWrapper(Microsoft.Agents.AI.AIAgent agent)
     private int _callCount = 0;
 
     public async Task<string> RunAsync(string input,
-        object? thread = null)
+        Microsoft.Agents.AI.AgentSession? session = null)
     {
         _callCount++;
         Log($"[#{_callCount}] 요청: {input}");
@@ -110,8 +110,8 @@ class LoggingAgentWrapper(Microsoft.Agents.AI.AIAgent agent)
         var sw = System.Diagnostics.Stopwatch.StartNew();
         try
         {
-            var result = thread != null
-                ? await agent.RunAsync(input, thread)
+            var result = session != null
+                ? await agent.RunAsync(input, session)
                 : await agent.RunAsync(input);
             sw.Stop();
             Log($"[#{_callCount}] 응답 ({sw.ElapsedMilliseconds}ms): {result.Text[..Math.Min(60, result.Text.Length)]}");
